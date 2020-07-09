@@ -1,0 +1,38 @@
+object ZoomForm: TZoomForm
+  Left = 668
+  Height = 100
+  Top = 42
+  Width = 148
+  AlphaBlendValue = 100
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSizeToolWin
+  Caption = 'Zoom..'
+  ClientHeight = 100
+  ClientWidth = 148
+  Constraints.MaxHeight = 500
+  Constraints.MaxWidth = 500
+  Constraints.MinHeight = 50
+  Constraints.MinWidth = 50
+  FormStyle = fsSystemStayOnTop
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
+  OnResize = FormResize
+  LCLVersion = '1.6.4.0'
+  object ImageZoom: TImage
+    Cursor = crNo
+    Left = 0
+    Height = 100
+    Top = 0
+    Width = 148
+    AntialiasingMode = amOn
+    Align = alClient
+    Proportional = True
+  end
+  object TimerZoom: TTimer
+    Interval = 50
+    OnTimer = TimerZoomTick
+    left = 64
+    top = 24
+  end
+end

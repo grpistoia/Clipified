@@ -1,0 +1,204 @@
+object Options: TOptions
+  Left = 761
+  Height = 526
+  Top = 187
+  Width = 396
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Options'
+  ClientHeight = 526
+  ClientWidth = 396
+  Constraints.MinHeight = 358
+  Constraints.MinWidth = 340
+  Font.Color = clInfoText
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.6.0.4'
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 128
+    Top = 8
+    Width = 382
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Behaviour'
+    ClientHeight = 109
+    ClientWidth = 378
+    ParentFont = False
+    TabOrder = 0
+    object CheckBoxMinimal: TCheckBox
+      Left = 72
+      Height = 22
+      Hint = 'Add or remove the windows title and border'
+      Top = 8
+      Width = 173
+      Caption = 'Minimal windows size'
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+    end
+    object CheckBoxTrayIcon: TCheckBox
+      Left = 72
+      Height = 22
+      Top = 32
+      Width = 124
+      Caption = 'Show tray icon'
+      TabOrder = 1
+    end
+    object CheckBoxShowBalloons: TCheckBox
+      Left = 72
+      Height = 22
+      Top = 56
+      Width = 162
+      Caption = 'Show balloons hints'
+      TabOrder = 2
+    end
+    object CheckBoxAutoTrim: TCheckBox
+      Left = 72
+      Height = 22
+      Hint = 'Remove Excel extra newline'
+      Top = 80
+      Width = 194
+      Caption = 'Auto trim single new line'
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 3
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 8
+    Height = 168
+    Top = 152
+    Width = 382
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Automatic Backup'
+    ClientHeight = 149
+    ClientWidth = 378
+    ParentFont = False
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 8
+      Height = 17
+      Top = 13
+      Width = 48
+      Caption = 'Folder:'
+      ParentColor = False
+    end
+    object EditBackupSourceDir: TDirectoryEdit
+      Left = 72
+      Height = 27
+      Top = 8
+      Width = 297
+      ShowHidden = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 0
+      OnChange = FolderOrZipFileChange
+    end
+    object Label2: TLabel
+      Left = 8
+      Height = 17
+      Top = 48
+      Width = 51
+      Caption = 'Zip file:'
+      ParentColor = False
+    end
+    object EditBackupTargetFile: TFileNameEdit
+      Left = 72
+      Height = 27
+      Top = 45
+      Width = 297
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 1
+      OnChange = FolderOrZipFileChange
+    end
+    object Label3: TLabel
+      Left = 8
+      Height = 17
+      Top = 82
+      Width = 37
+      Caption = 'Time:'
+      ParentColor = False
+    end
+    object EditBackupTime: TTimeEdit
+      Left = 72
+      Height = 27
+      Top = 80
+      Width = 129
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      TabOrder = 2
+    end
+    object ButtonTestBackup: TButton
+      Left = 236
+      Height = 25
+      Top = 79
+      Width = 133
+      Caption = 'Backup now..'
+      OnClick = ButtonTestBackupClick
+      TabOrder = 3
+    end
+    object LabelHint: TLabel
+      Left = 8
+      Height = 18
+      Top = 120
+      Width = 361
+      Anchors = [akTop, akLeft, akRight]
+      AutoSize = False
+      Caption = '(Use % for date: %dd: day, %ddd: weekday, etc.)'
+      Font.Style = [fsItalic]
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object OkButton: TBitBtn
+    Left = 207
+    Height = 30
+    Top = 492
+    Width = 87
+    Anchors = [akRight, akBottom]
+    Caption = '&Save'
+    Kind = bkOK
+    ModalResult = 1
+    OnClick = OkButtonClick
+    ParentFont = False
+    TabOrder = 2
+  end
+  object CancelButton: TBitBtn
+    Left = 303
+    Height = 30
+    Top = 492
+    Width = 87
+    Anchors = [akRight, akBottom]
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    ParentFont = False
+    TabOrder = 3
+  end
+  object MemoCopyright: TMemo
+    Left = 7
+    Height = 159
+    Top = 329
+    Width = 382
+    Font.Color = clInfoText
+    Font.Height = -14
+    Font.Name = 'Courier New'
+    Lines.Strings = (
+      'Copyright'
+    )
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssAutoBoth
+    TabOrder = 4
+    WordWrap = False
+  end
+end

@@ -1,0 +1,70 @@
+object NotesForm: TNotesForm
+  Left = 569
+  Height = 313
+  Top = 208
+  Width = 478
+  ActiveControl = NotesMemo
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsToolWindow
+  Caption = 'Notes'
+  ClientHeight = 313
+  ClientWidth = 478
+  Font.Color = clInfoText
+  Font.Height = -14
+  Font.Name = 'Courier New'
+  KeyPreview = True
+  OnKeyPress = FormKeyPress
+  LCLVersion = '1.6.0.4'
+  object GroupBox: TGroupBox
+    Left = 8
+    Height = 262
+    Top = 8
+    Width = 462
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Caption = 'Enter notes here:'
+    ClientHeight = 243
+    ClientWidth = 458
+    ParentFont = False
+    TabOrder = 0
+    object NotesMemo: TMemo
+      Left = 0
+      Height = 243
+      Top = 0
+      Width = 458
+      Align = alClient
+      BorderStyle = bsNone
+      Font.Height = -14
+      Font.Name = 'Courier New'
+      ParentFont = False
+      ScrollBars = ssAutoBoth
+      TabOrder = 0
+      WantTabs = True
+    end
+  end
+  object OkButton: TBitBtn
+    Left = 287
+    Height = 30
+    Top = 278
+    Width = 87
+    Anchors = [akRight, akBottom]
+    Caption = '&Save'
+    Default = True
+    Kind = bkOK
+    ModalResult = 1
+    ParentFont = False
+    TabOrder = 1
+  end
+  object CancelButton: TBitBtn
+    Left = 383
+    Height = 30
+    Top = 278
+    Width = 87
+    Anchors = [akRight, akBottom]
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    ParentFont = False
+    TabOrder = 2
+  end
+end
