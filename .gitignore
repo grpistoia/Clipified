@@ -4,7 +4,7 @@
 
 # Lazarus generated
 *.bak
-*.exe
+#*.exe
 *.dll
 *.bpl
 *.bpi
