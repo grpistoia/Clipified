@@ -13,19 +13,19 @@ const
 
     { NAME AND STUFF }
     APP_NAME         = 'Clipified';  { Used also for Registry and file }
-    APP_VERSION      = 'v8.0';
+    APP_VERSION      = 'v8.6';
     APP_DESC         = APP_NAME + ' ' + APP_VERSION;
-    APP_RELEASE_TEXT = '07/07/2020';
+    APP_RELEASE_TEXT = '18/07/2020';
 
     { Expiration after this }
-    EXPIRY_MONTHS    = 24;
+    EXPIRY_MONTHS    = 12*5;
 
     { Generic message }
     COPYRIGHT     = ' ' + APP_DESC + LineEnding +
-                    ' Author: Gustavo R. Pistoia' + LineEnding +
+                    ' Author: Gustavo Pistoia' + LineEnding +
                     ' Date  : ' + APP_RELEASE_TEXT + LineEnding +
-                    '   This software was designed on my own personal time, outside working hours, with my own computer' + LineEnding +
-                    '   and materials, without help or intructions from anyone or any organisation.' + LineEnding +
+                    '   This software was created on my own personal time, outside working hours, with my own computer' + LineEnding +
+                    '   and materials, without help or intructions from anybody or any organisation.' + LineEnding +
                     '   This software comes with no WARRANTY; without even the implied warranty of merchantability or fitness for a particular purpose.' + LineEnding +
                     '   This application will always belong to the author and can never be sold, used, modified or installed without consent of the author.' + LineEnding +
                     '   This application continues to belong to the author regardless in which organisation or computer runs.' + LineEnding +
@@ -51,7 +51,6 @@ const
 
     { How long is it? }
     WARN_TIME_BEFORE_BREAK   : TDateTime = OneMinute * 4;
-    TIME_SHOW_WORKED_TIME    : TDateTime = OneMinute * 1;
     TIME_CONSIDERED_INACTIVE : TDateTime = OneMinute * 3;
     TIME_CONSIDERED_A_BREAK  : TDateTime = OneMinute * 5;
     POSTPONE_TIME_FOR_BREAK  : TDateTime = OneMinute * 15;
@@ -63,7 +62,7 @@ const
 
     { pause }
     PAUSE_REMINDER_TIME_IS_UP     = 'Time is up! Have some rest.';
-    PAUSE_REMINDER_TIME_ALMOST_UP = 'Take a break!!!';
+    PAUSE_REMINDER_TIME_ALMOST_UP = 'Take a break !!!';
 
     { behaviour }
     WINDOW_START_TOP  = {$IFDEF UNIX}  30 {$ELSE}   0  {$ENDIF};
@@ -74,7 +73,7 @@ const
 
     { how often to refresh.. big objects best to take a break }
     TIMER_REFRESH_SHORT =  250;
-    TIMER_REFRESH_LONG  = 2000;
+    TIMER_REFRESH_LONG  = 1500;
 
     { how long to display an important message }
     TIMER_SHOW_MESSAGE_SHORT = 3000;
@@ -113,15 +112,15 @@ const
     EDITIMAGEFORM_CONFIRMATION_MESSAGE = 'Selection complete. Copy to clipboard or retry?';
 
     { ZOOM FORM }
-    ZOOMFORM_KEY_FOR_REFRESH = ssCtrl;
+    ZOOMFORM_KEY_FOR_REFRESH = ssShift;
+    ZOOMFORM_KEY_FOR_FREEZE = ssAlt;
 
 var
     // Desktop behaviour
     UseMinimalWindowSize  : boolean = true;
     ShowTrayIcon          : boolean = true;
     ShowBalloonHints      : boolean = true;
-    // Automatically trim entries...
-    AutomaticTrimNL       : boolean = false;
+    AutomaticTrim         : boolean = false;
     // Backup stuff
     BackupSourceDir       : string;
     BackupTargetFile      : string;
@@ -154,8 +153,8 @@ const
     RegistryTypeNames : array[TRegistryType] of string = ( 'Text', 'Picture' );
 
     // This is the text to show in the Menu
-    ContentActionGroupNames : array[TContentActionGroup] of string  = ( 'File/Folder', 'Website', 'Email', 'Number', 'Picture', 'Generic Content' );
-    ContentActionToKeep     : array[TContentActionGroup] of Integer = (  25,            25,        10,      40,       5,         0 );
+    ContentActionGroupNames : array[TContentActionGroup] of string  = ( 'File/Folder', 'Website', 'Email', 'Number', 'Picture', '' );
+    ContentActionToKeep     : array[TContentActionGroup] of Integer = (  25,            25,        10,      25,       5,         0 );
 
 implementation
 
@@ -197,6 +196,7 @@ implementation
             ssExtra2    : result := 'Extra2';
             otherwise result := 'Unknown';
         end;
+        result := '[' + result + ']';
     end;
 
     procedure TakeScreenshotFromCursor(var ApplyOnBitmap: TBitmap);

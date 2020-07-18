@@ -5,7 +5,6 @@ object EvaluatorForm: TEvaluatorForm
   Width = 519
   ActiveControl = MemoExpression
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsToolWindow
   Caption = 'Formula Evaluator'
   ClientHeight = 148
   ClientWidth = 519
@@ -36,9 +35,9 @@ object EvaluatorForm: TEvaluatorForm
   end
   object LabelA: TLabel
     Left = 8
-    Height = 18
-    Top = 64
-    Width = 20
+    Height = 17
+    Top = 65
+    Width = 18
     Anchors = [akLeft, akBottom]
     Caption = '&x : '
     FocusControl = EditX
@@ -59,9 +58,9 @@ object EvaluatorForm: TEvaluatorForm
   end
   object LabelB: TLabel
     Left = 8
-    Height = 18
-    Top = 92
-    Width = 20
+    Height = 17
+    Top = 93
+    Width = 17
     Anchors = [akLeft, akBottom]
     Caption = '&y : '
     FocusControl = EditY
@@ -78,13 +77,13 @@ object EvaluatorForm: TEvaluatorForm
     MaxLength = 20
     OnChange = EditYChange
     TabOrder = 2
-    Text = '25.0'
+    Text = '4.5'
   end
   object LabelResult: TLabel
-    Left = 255
-    Height = 18
-    Top = 64
-    Width = 57
+    Left = 259
+    Height = 17
+    Top = 65
+    Width = 53
     Anchors = [akRight, akBottom]
     Caption = 'Result : '
     ParentColor = False
@@ -110,7 +109,6 @@ object EvaluatorForm: TEvaluatorForm
     Top = 112
     Width = 87
     Caption = '&Copy'
-    Default = True
     Kind = bkOK
     ModalResult = 1
     OnClick = OkButtonClick

@@ -24,6 +24,7 @@ type
     { private declarations }
     FLastMousePosition : TPoint;
     FRefreshDesktopImage : Boolean;
+    FFreezeDesktopImage : Boolean;
     FDeskCopy : TBitmap; // for performance..
   public
     { public declarations }
@@ -52,6 +53,10 @@ begin
 
     // I DECIDED I DONT NEED TO REFRESH THE WHOLE SCREEN ALL THE TIME FOR VERY MINOR CHANGES.. SUCH AS.. THE CLOCK AREA.
     TakeScreenshotFromCursor(FDeskCopy);
+
+    // Add the hint now
+    ImageZoom.Hint:= 'Press ' + ShiftStateToText(ZOOMFORM_KEY_FOR_REFRESH) + ' to constantly refresh the Desktop image. Press ' + ShiftStateToText(ZOOMFORM_KEY_FOR_FREEZE) + ' to freeze the zoom regardless of mouse move.';
+    ImageZoom.ShowHint:= true;
 
 end;
 
@@ -92,7 +97,7 @@ var isMouseInside : Boolean;
 begin
     try
         // To the image..
-        targetRect := Rect(0, 0, ImageZoom.Width, ImageZoom.Height); // full extend
+        targetRect := Rect(0, 0, ImageZoom.Width, ImageZoom.Height);
 
         // Copy..
         mousePosition := Point(0, 0);
@@ -109,11 +114,20 @@ begin
 
         end else begin
 
-            // Once I pressed the refresh key.. it will remain.. (otherwise is confusing)
-            FRefreshDesktopImage := FRefreshDesktopImage or (ZOOMFORM_KEY_FOR_REFRESH in GetKeyShiftState);
+            // Once I pressed the freeze key.. it will remain.. (otherwise is confusing).. and stop the refresh
+            if (ZOOMFORM_KEY_FOR_FREEZE in GetKeyShiftState) then begin
+               FFreezeDesktopImage := true;
+               FRefreshDesktopImage := false;
+            end;
+
+            // Once I pressed the refresh key.. it will remain.. (otherwise is confusing) .. and stop the freeze
+            if (ZOOMFORM_KEY_FOR_REFRESH in GetKeyShiftState) then begin
+                FFreezeDesktopImage := false;
+                FRefreshDesktopImage := true;
+            end;
 
             // same.. dont do it again.. otherwise becomes sluggish..
-            if (FRefreshDesktopImage or (not PointsEqual(FLastMousePosition, mousePosition))) then begin
+            if (not FFreezeDesktopImage) and (FRefreshDesktopImage or (not PointsEqual(FLastMousePosition, mousePosition))) then begin
 
                 // Keep it..
                 FLastMousePosition := mousePosition;

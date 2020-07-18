@@ -172,20 +172,23 @@ begin
     // to ensure is set to something..
     FLastMousePosition := Point(0, 0);
 
-    // Listener
-    FClipboardListener := TClipboardListener.Create;
-
     // Reload config  (after I applied the defaults)
     LoadFromRegistry();
 
     // Process the one you got
     // AnalyseClipboard();    Wait for full load to analyse it..
 
-    // Managed to connect the clipboard...
-    if (FClipboardListener.Supported) then ShowMessage('Clipboard Hooked..') else ShowMessage(Caption);
-
     // Set the idle..
     Application.OnIdleEnd := @OnAppIdleEnd;
+
+    // Show info
+    ShowInfo(APP_DESC);
+
+    // Listener
+    FClipboardListener := TClipboardListener.Create;
+
+    // Managed to connect the clipboard...
+    if (FClipboardListener.Supported) then ShowInfo('Clipboard Hooked..');
 
 end;
 
@@ -213,21 +216,24 @@ end;
 
 procedure TClipifiedForm.FormActivate(Sender: TObject);
 begin
-    // Show info
-    ShowInfo(APP_DESC);
     // Because menu will appear, or combo.. allow those to be in front
     MakeWindowStayOnTop;
 end;
 
 procedure TClipifiedForm.ShowMessage(Message: string);
+var finalMessage : string;
 begin
     // This one is not that important may be..
     if (FMessageDelayTime <= 0) then begin
-        // a bit of wait..
-        FMessageDelayTime  := TIMER_SHOW_MESSAGE_SHORT;
+        // Empty message.. show the time worked..
+        if (Message = '')
+            then finalMessage := 'Hours worked: ' + FormatDateTime('hh:nn', (FAccumulatedWork + Max(0.0, FLastActivitySeen - FLastBreakTaken)))
+            else finalMessage := Message;
         // Not showing.. do now..
         LblInfo.Font.Color := TEXT_NORMAL_COLOR;
-        LblInfo.Caption := Message;
+        LblInfo.Caption := finalMessage;
+        // a bit of wait..
+        FMessageDelayTime  := TIMER_SHOW_MESSAGE_SHORT;
     end;
 end;
 
@@ -362,10 +368,6 @@ begin
 
                 // Show
                 if (bigBreak) then ShowInfo(breakText) else ShowMessage(breakText);
-
-            end else if ((rightNow - FLastActivitySeen) >= TIME_SHOW_WORKED_TIME) then begiN
-
-                ShowInfo('Hours worked: ' + FormatDateTime('hh:nn', (FAccumulatedWork + Max(0.0, FLastActivitySeen - FLastBreakTaken))));
 
             end;
 
@@ -994,7 +996,7 @@ procedure TClipifiedForm.UpdateButtonOpenClipboard();
 begin
     // Sync..
     if (ClipboardHistory.IsEmpty())
-        then BtnOpenClipboard.Caption := ''
+        then BtnOpenClipboard.Caption := 'No items recorded'
         else BtnOpenClipboard.Caption := ' ' + ClipboardHistory.NewestItem.ToStringOneLine;
 end;
 
@@ -1020,7 +1022,7 @@ begin
                 if (registry.ValueExists(REGISTRY_SHOW_TRAY_ICON))       then UGlobals.ShowTrayIcon         := StrToBool(registry.ReadString(REGISTRY_SHOW_TRAY_ICON));
                 if (registry.ValueExists(REGISTRY_SHOW_BALLOON_HINTS))   then UGlobals.ShowBalloonHints     := StrToBool(registry.ReadString(REGISTRY_SHOW_BALLOON_HINTS));
                 // Automatically trim
-                if (registry.ValueExists(REGISTRY_AUTOMATIC_TRIM))       then UGlobals.AutomaticTrimNL      := StrToBool(registry.ReadString(REGISTRY_AUTOMATIC_TRIM));
+                if (registry.ValueExists(REGISTRY_AUTOMATIC_TRIM))       then UGlobals.AutomaticTrim        := StrToBool(registry.ReadString(REGISTRY_AUTOMATIC_TRIM));
                 // Backup stuff
                 if (registry.ValueExists(REGISTRY_BACKUP_SOURCE_DIR))    then UGlobals.BackupSourceDir      := registry.ReadString(REGISTRY_BACKUP_SOURCE_DIR);
                 if (registry.ValueExists(REGISTRY_BACKUP_TARGET_FILE))   then UGlobals.BackupTargetFile     := registry.ReadString(REGISTRY_BACKUP_TARGET_FILE);
@@ -1034,8 +1036,11 @@ begin
                 // If saved long ago.. forget it
                 if (Self.FLastBreakTaken < (Now() - OneHour)) then Self.FLastBreakTaken := Now();
 
-                { try to load the old items..}
+                // try to load the old items..
                 ClipboardHistory.LoadContentFromRegistry(registry);
+
+                // When loading.. is weird to show for a while the thing the last time saved.. so insert empty
+                ClipboardHistory.Insert(TClipboardUnhandledContent.CreateSoftwareLoadedMessage());
 
                 // Sync..
                 UpdateButtonOpenClipboard();
@@ -1082,7 +1087,7 @@ begin
             registry.WriteString(REGISTRY_SHOW_TRAY_ICON,       BoolToStr(UGlobals.ShowTrayIcon));
             registry.WriteString(REGISTRY_SHOW_BALLOON_HINTS,   BoolToStr(UGlobals.ShowBalloonHints));
             // Automatically trim
-            registry.WriteString(REGISTRY_AUTOMATIC_TRIM,       BoolToStr(UGlobals.AutomaticTrimNL));
+            registry.WriteString(REGISTRY_AUTOMATIC_TRIM,       BoolToStr(UGlobals.AutomaticTrim));
             // Backup stuff
             registry.WriteString(REGISTRY_BACKUP_SOURCE_DIR,    UGlobals.BackupSourceDir);
             registry.WriteString(REGISTRY_BACKUP_TARGET_FILE,   UGlobals.BackupTargetFile);
@@ -1238,20 +1243,20 @@ begin
             // Nothing loaded, or this was already
             if (currentClipboard <> NIL) then begin
 
-                // BIG items.. tend to end up locking the clipboard.. so for those I wait a bit.
-                RefreshEvent.Interval := currentClipboard.refreshRate;
-
                 // has something before (most times)
                 hasSomethingNewToShow := (ClipboardHistory.HasItems) and (not ClipboardHistory.NewestItem.Equals( currentClipboard ));
 
                 // notification if required...
                 if (ClipboardHistory.IsEmpty or hasSomethingNewToShow) then begin
 
+                    // BIG items.. tend to end up locking the clipboard.. so for those I wait a bit.
+                    RefreshEvent.Interval := currentClipboard.refreshRate;
+
                     // Is a number?
-                    if (UGlobals.AutomaticTrimNL) then currentClipboard.TrimAndReapply;
+                    if (UGlobals.AutomaticTrim) then currentClipboard.TrimAndReapply;
 
                     // Remove the notifications and I cannot save..
-                    ClipboardHistory.DeleteTopUselessContent;
+                    ClipboardHistory.DeleteTopInformativeContent;
 
                     // Delete if existed before
                     if (ClipboardHistory.Contains(currentClipboard)) then begin
@@ -1284,7 +1289,7 @@ begin
                         SaveInRegistry(false);
 
                         // Show..
-                        ShowWarning(MESSAGE_CLIPBOARD_STORED);
+                        ShowInfo(MESSAGE_CLIPBOARD_STORED);
 
                         // Make it obvious
                         if (UGlobals.ShowBalloonHints) then begin

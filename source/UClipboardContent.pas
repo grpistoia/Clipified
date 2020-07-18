@@ -44,6 +44,7 @@ type
         constructor CreateEmptyClipboardMessage;
         constructor CreateObjectTooBigMessage;
         constructor CreateUnknownObject;
+        constructor CreateSoftwareLoadedMessage;
         function    Equals(Obj: TObject) : Boolean; override;
         function    ToString : AnsiString; override;
         function    UselessContent : Boolean; override;
@@ -98,6 +99,8 @@ type
         function  ToString : AnsiString; override;
         function  GetActionGroup: TContentActionGroup; override;
         procedure TrimAndReapply; override;
+    class
+        function  simplified(inputString: AnsiString): AnsiString;
     end;
 
     { Representing a picture... }
@@ -158,10 +161,12 @@ type
         function    IsFull: Boolean;
         procedure   Insert(NewItem: TClipboardContent);
         procedure   Append(NewItem: TClipboardContent);
+        procedure   MoveToTop(OldItem: TClipboardContent);
+        function    Remove(OldIndex: Integer): TClipboardContent;
         procedure   Delete(OldItem: TClipboardContent);
         procedure   Delete(OldIndex: Integer);
         procedure   Clear;
-        procedure   DeleteTopUselessContent;
+        procedure   DeleteTopInformativeContent;
     public
         procedure   LoadContentFromRegistry(Registry: TRegistry);
         procedure   SaveContentToRegistry(Registry: TRegistry);
@@ -311,19 +316,25 @@ implementation
     constructor TClipboardUnhandledContent.CreateEmptyClipboardMessage;
     begin
         inherited Create();
-        Self.FMessage := '{Empty Clipboard}';
+        Self.FMessage := '{Clipboard empty}';
     end;
 
     constructor TClipboardUnhandledContent.CreateObjectTooBigMessage;
     begin
         inherited Create();
-        Self.FMessage := '{Object too big}';
+        Self.FMessage := '{Content too big}';
     end;
 
     constructor TClipboardUnhandledContent.CreateUnknownObject;
     begin
         inherited Create();
-        Self.FMessage := '{Unknown object}';
+        Self.FMessage := '{Clipboard encoded}';
+    end;
+
+    constructor TClipboardUnhandledContent.CreateSoftwareLoadedMessage;
+    begin
+        inherited Create();
+        Self.FMessage := '{History loaded: ' + IntToStr(ClipboardHistory.Count) + ' items}';
     end;
 
     function TClipboardUnhandledContent.Equals(Obj: TObject) : Boolean;
@@ -370,8 +381,8 @@ implementation
     begin
         // Just paste back
         OpenDocument(FText);
-        // After removing spaces.. put it in the clipboard again..
-        ApplyToClipboard;
+        // Move on top of the list so doesnt get drop out as obsolete
+        ClipboardHistory.MoveToTop(self);
     end;
 
     procedure TClipboardContentFilePath.TrimAndReapply;
@@ -396,8 +407,8 @@ implementation
     begin
         // And open the URL
         OpenURL(FText);
-        // After removing spaces.. put it in the clipboard again..
-        ApplyToClipboard;
+        // Move on top of the list so doesnt get drop out as obsolete
+        ClipboardHistory.MoveToTop(self);
     end;
 
     procedure TClipboardContentURL.TrimAndReapply;
@@ -440,14 +451,17 @@ implementation
     procedure TClipboardContentNumberID.TrimAndReapply;
     begin
         // Only if different..
-        if (Self.FText <> Trim(Self.FText)) then begin
+        if (Self.FText <> simplified(Self.FText)) then begin
             // Chop..
-            Self.FText := Trim(Self.FText);
-            // Trim
-            Self.FText := AnsiReplaceText(FText, LineEnding, '');
+            Self.FText := simplified(FText);
             // Force a change..
             ApplyToClipboard;
         end;
+    end;
+
+    class function TClipboardContentNumberID.simplified(inputString: AnsiString): AnsiString;
+    begin
+        result := Trim(AnsiReplaceText(AnsiReplaceText(AnsiReplaceText(AnsiReplaceText(AnsiReplaceText(inputString, '$', ''), ',', ''), #9, ' '), #10, ' '), #13, ' '));
     end;
 
     function TClipboardContentNumberID.ToString : AnsiString;
@@ -472,14 +486,16 @@ implementation
     begin
         inherited Create();
         FPicture := TPicture.Create;
-        FPicture.Bitmap.Assign(Clipboard);
+        //FPicture.Bitmap.Assign(Clipboard); seems to be buggy..
+        FPicture.Assign(Clipboard);
     end;
 
     constructor TClipboardContentPicture.CreatePixmapFromClipboard();
     begin
         inherited Create();
         FPicture := TPicture.Create;
-        FPicture.Pixmap.Assign(Clipboard);
+        //FPicture.Pixmap.Assign(Clipboard); seems to be buggy..
+        FPicture.Assign(Clipboard);
     end;
 
     constructor TClipboardContentPicture.CreatePictureFromClipboard();
@@ -660,13 +676,35 @@ implementation
         end;
     end;
 
-    procedure TClipboardHistory.Delete(OldIndex: Integer);
+    procedure TClipboardHistory.MoveToTop(OldItem: TClipboardContent);
+    var originallyTopItem : TClipboardContent;
+    begin
+         // has many items..
+        if (FCount >= 2) and (IndexOf(OldItem) > 0) then begin
+
+            // What do you have as first.. will be reinserted as first
+            originallyTopItem := Remove(0);
+
+            // Remove from the bottom of the list without destroying ..
+            Remove(IndexOf(OldItem));
+
+            // This will reinsert as first
+            Insert(OldItem);
+
+            // Reinsert the originally first one (which should match the clipboard)
+            // to avoid the "restored" message
+            Insert(originallyTopItem);
+
+        end;
+    end;
+
+    function TClipboardHistory.Remove(OldIndex: Integer): TClipboardContent;
     var iterator: Integer;
         oldItem: TClipboardContent;
-        oldActionGroup : TContentActionGroup;
     begin
         // Take it out before moving..
         oldItem := FItems[OldIndex];
+
         // Remove first.. so next time doesnt failt any more
         if (OldIndex >= 0) and (OldIndex <= FCount -1) then begin
             for iterator := OldIndex to (FCount - 1) - 1 do begin
@@ -676,13 +714,28 @@ implementation
         end;
         FCount := FCount - 1;
 
+        // does not destroy.. just returns..
+        result := OldItem;
+    end;
+
+    procedure TClipboardHistory.Delete(OldIndex: Integer);
+    var oldItem: TClipboardContent;
+        oldActionGroup : TContentActionGroup;
+    begin
         // Default...
         oldActionGroup := cagNone;
         try
+            // Take it out before moving..
+            oldItem := FItems[OldIndex];
+
             // Type
             oldActionGroup := OldItem.GetActionGroup;
+
+            // Remove from list..
+            Remove(OldIndex);
+
             // Blow this one
-            FreeAndNil(OldItem);
+            FreeAndNil(oldItem);
         except
             // Forget it anyway.. cant save it..
             MessageDlg('Error deleting ' + ContentActionGroupNames[oldActionGroup], mtConfirmation, [mbClose], 0);
@@ -757,14 +810,14 @@ implementation
     end;
 
     class function TClipboardHistory.CreateContentFromText(OriginalText: string): TClipboardContentText;
-    var ID: Longint;
+    var ID: Extended;
         trimmedText: string;
     begin
         // do it once..
         trimmedText := Trim(OriginalText);
 
         // is it a number? (void massive comparison)
-        if (Length(trimmedText) < 50) and (TryStrToInt(trimmedText, ID)) then begin
+        if (Length(trimmedText) <= 20) and (TryStrToFloat(TClipboardContentNumberID.simplified(trimmedText), ID)) then begin
             // create it
             result := TClipboardContentNumberID.Create(OriginalText);
             // Done
@@ -772,23 +825,30 @@ implementation
         end;
 
         // seems like.. URL?
-        if (Length(trimmedText) < 1024) and (AnsiStartsStr('http://', Lowercase(trimmedText)) or AnsiStartsStr('https://', Lowercase(trimmedText))) then begin
-            // create it
-            result := TClipboardContentURL.Create(OriginalText);
-            // Done
-            EXIT;
-        end;
-
-        // seems like.. URL?
-        if (Length(trimmedText) < 120) and (AnsiContainsStr(Lowercase(trimmedText), '@')) then begin
+        if (Length(trimmedText) <= 120) and (AnsiContainsStr(trimmedText, '@')) then begin
             // create it
             result := TClipboardContentEmails.Create(OriginalText);
             // Done
             EXIT;
         end;
 
-        // is it a path? (void massive comparison)
-        if (Length(trimmedText) < 1024) and (DirectoryExists(trimmedText) or FileExists(trimmedText)) then begin
+        // seems like.. URL?
+        if (Length(trimmedText) <= 512)
+            and (AnsiStartsStr('http://', Lowercase(trimmedText))
+                 or
+                 AnsiStartsStr('https://', Lowercase(trimmedText))
+                 or
+                 AnsiStartsStr('ftp://', Lowercase(trimmedText))
+                 or
+                 AnsiStartsStr('www.', Lowercase(trimmedText))) then begin
+            // create it
+            result := TClipboardContentURL.Create(OriginalText);
+            // Done
+            EXIT;
+        end;
+
+        // is it a path? (avoid massive comparison)
+        if (Length(trimmedText) <= 1024) and (DirectoryExists(trimmedText) or FileExists(trimmedText)) then begin
             // create it
             result := TClipboardContentFilePath.Create(OriginalText);
             // Done
@@ -828,18 +888,18 @@ implementation
             // cached..
             cachedText := Clipboard.AsText;
 
-            // Too big?
-            if (Length(cachedText) > 400000) then begin
-                // Just use the default one to stop further processing
-                result := TClipboardUnhandledContent.CreateObjectTooBigMessage;
-                // Stop
-                EXIT;
-            end;
-
             // Nothing..
             if (Length(Trim(cachedText)) = 0) then begin
                 // Just use the default one to stop further processing
                 result := TClipboardUnhandledContent.CreateEmptyClipboardMessage;
+                // Stop
+                EXIT;
+            end;
+
+            // Too big?
+            if (Length(cachedText) > 400000) then begin
+                // Just use the default one to stop further processing
+                result := TClipboardUnhandledContent.CreateObjectTooBigMessage;
                 // Stop
                 EXIT;
             end;
@@ -926,7 +986,7 @@ implementation
         end;
     end;
 
-    procedure TClipboardHistory.DeleteTopUselessContent;
+    procedure TClipboardHistory.DeleteTopInformativeContent;
     var tempItem : TClipboardContent;
     begin
         // No items?

@@ -17,7 +17,8 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="8"/>
-      <StringTable Comments="Manages the clipboard" CompanyName="Gustavo R. Pistoia" ProductVersion=""/>
+      <MinorVersionNr Value="6"/>
+      <StringTable Comments="Clipboard tools" CompanyName="Gustavo Pistoia" ProductName="Clipified" ProductVersion="8.6"/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>

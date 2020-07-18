@@ -18,7 +18,7 @@ object ZoomForm: TZoomForm
   OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   OnResize = FormResize
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.6.0.4'
   object ImageZoom: TImage
     Cursor = crNo
     Left = 0
@@ -30,7 +30,7 @@ object ZoomForm: TZoomForm
     Proportional = True
   end
   object TimerZoom: TTimer
-    Interval = 50
+    Interval = 150
     OnTimer = TimerZoomTick
     left = 64
     top = 24

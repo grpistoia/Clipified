@@ -53,7 +53,7 @@ begin
     CheckBoxMinimal.Checked       := UGlobals.UseMinimalWindowSize;
     CheckBoxTrayIcon.Checked      := UGlobals.ShowTrayIcon;
     CheckBoxShowBalloons.Checked  := UGlobals.ShowBalloonHints;
-    CheckBoxAutoTrim.Checked      := UGlobals.AutomaticTrimNL;
+    CheckBoxAutoTrim.Checked      := UGlobals.AutomaticTrim;
 
     // Backup stuff
     EditBackupSourceDir.Text      := UGlobals.BackupSourceDir;
@@ -75,7 +75,7 @@ begin
     UGlobals.UseMinimalWindowSize  := CheckBoxMinimal.Checked;
     UGlobals.ShowTrayIcon          := CheckBoxTrayIcon.Checked;
     UGlobals.ShowBalloonHints      := CheckBoxShowBalloons.Checked;
-    UGlobals.AutomaticTrimNL       := CheckBoxAutoTrim.Checked;
+    UGlobals.AutomaticTrim         := CheckBoxAutoTrim.Checked;
 
     // Backup stuff
     UGlobals.BackupSourceDir       := EditBackupSourceDir.Text;

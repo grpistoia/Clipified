@@ -1,13 +1,13 @@
 object ClipifiedForm: TClipifiedForm
   Cursor = crHandPoint
-  Left = 527
+  Left = 532
   Height = 184
-  Top = 364
+  Top = 395
   Width = 434
   AllowDropFiles = True
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsNone
-  Caption = 'Clippy'
+  Caption = 'Clipified'
   ClientHeight = 184
   ClientWidth = 434
   Color = clInfoBk
@@ -1280,7 +1280,7 @@ object ClipifiedForm: TClipifiedForm
     end
   end
   object RefreshEvent: TTimer
-    Interval = 2000
+    Interval = 5000
     OnTimer = RefreshEventTimer
     left = 112
     top = 40

@@ -107,7 +107,7 @@ begin
         // add the item..
         PopupExpressions.Items.Add(tempMenu);
     end;
-    // Select the first one by default...
+    // Show one by default...
     MemoExpression.Lines.Text := AllExpressions[1].Expression;
 end;
 
@@ -266,10 +266,20 @@ begin
     Result.resFloat := Power(ArgToFloat(Args[0]), ArgToFloat(Args[1]));
 end;
 
+procedure BuildRoundTo(var Result : TFPExpressionResult; const Args : TExprParameterArray);
+var value : Extended;
+    digits : integer;
+begin
+    value := ArgToFloat(Args[0]);
+    digits := trunc(power(10, max(0, min(20, trunc(ArgToFloat(Args[1]))))));
+    Result.resFloat := Round(value * digits) / digits;
+end;
+
 initialization
 
     // Shame this was missing..
-    BuiltinIdentifiers.AddFunction(bcMath, 'power', 'F', 'FF', @BuiltPower);
+BuiltinIdentifiers.AddFunction(bcMath, 'power', 'F', 'FF', @BuiltPower);
+BuiltinIdentifiers.AddFunction(bcMath, 'roundto', 'F', 'FI', @BuildRoundTo);
 
 end.
 
