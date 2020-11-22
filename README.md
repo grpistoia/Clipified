@@ -50,7 +50,7 @@ There are lots of interesting features in this menus, that can be learned only b
 
 **Zoom** : This menu will open a small preview screen zooming in the area around the mouse. The zoom preview window can be made bigger if you require to see more. The zoom preview will not zoom itself but instead become transparent for when you need to see behind it. Most times users want to zoom on a fixed image, for instance, a part of application, so the image zoomed is actually static; therefore moving near the clock you will notice the time does not change. Basically the zoom acts like zooming a photograph. If that is not behaviour you want, but you need to zoom on the current changing desktop, just simply press [SHIFT] key and the zoom will refresh as you move the mouse. The [ALT] key will freeze the movement at the current mouse position, allowing you to copy a zoomed text to another application.
 
-**Eyes break** : This option will allow you to setup an alert on a few predefined deadlines (30min, 1h, 2h, 4h) to remind you to have a some rest. If you have not taken a break during that time, the application will show an alert. If the computer was iddle for few minutes, or the screen saver gets activated, the time will be considered a rest, and the alert counter will restart when you return. Notice that there are cases that Windows does not report the screen saver as active (Start menu for instance), or cases where the keys sent to other applications are not reported (probably for security reasons), so the mouse movement is registered as change.
+**Eyes rest** : This option will allow you to setup an alert on a few predefined deadlines (30min, 1h, 2h, 4h) to remind you to have a some rest. If you have not taken a break during that time, the application will show an alert. If the computer was iddle for few minutes, or the screen saver gets activated, the time will be considered a rest, and the alert counter will restart when you return. Notice that there are cases that Windows does not report the screen saver as active (Start menu for instance), or cases where the keys sent to other applications are not reported (probably for security reasons), so the mouse movement is registered as change.
 
 **Notes** : This option will allow you to save name, phones, emails or other information quickly, very handy when you are on the phone and ran out of postix (especially when you don´t have 30min to wait for Outlook to open and sync folders). As soon as you press [SAVE] to close the dialogue-box the text will be stored. It will be automatically restored after you reboot the computer.
 
@@ -78,8 +78,8 @@ Hope saves you time as it did for me.
 Gustavo.
 
 
-PS:
+## License
 
-Read the full license for more information.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
