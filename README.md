@@ -73,6 +73,8 @@ By right clicking on the right side of the application on top of the button a sp
 
 This application assumes only you use your computer with your user id, which is how the information is kept protected. Information is kept in the registry under your user and a full copy as a temporary file in your temp folder. Deleting your user profile in your machine will destroy the information. You can also use the popup menu to destroy all information, especially if you want to uninstall it.
 
+To open the GitHub Page click [here](https://grpistoia.github.io/Clipified/)
+
 Hope saves you time as it did for me.
 
 Gustavo.
